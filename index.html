@@ -167,6 +167,36 @@
                 alert('Format JSON tidak valid. Pastikan teks yang dimasukkan adalah JSON yang benar.');
                 console.error(error);
             }
+
+            const extractResult = document.getElementById('extractResult');
+            
+            if (!inputText) {
+                alert('Masukkan teks terlebih dahulu!');
+                return;
+            }
+            
+            try {
+                // Validasi apakah input adalah JSON yang valid
+                const parsedInput = JSON.parse(inputText);
+                
+                // Ekstrak nilai NAME, LOKASI dan STATE_PROV
+                const name = parsedInput.properties?.NAME || "";
+                const stateProv = parsedInput.properties?.STATE_PROV || "";
+                const lokasi = parsedInput.properties?.LOKASI || "";
+                
+                // Format hasil ekstraksi sesuai permintaan
+                let result = "";
+                if (name && stateProv) {
+                        result = `${name} - ${stateProv}`;
+                } else {
+                    result = "Data NAME atau STATE_PROV tidak lengkap";
+                }
+                
+                extractResult.textContent = result;
+            } catch (error) {
+                alert('Format JSON tidak valid. Pastikan teks yang dimasukkan adalah JSON yang benar.');
+                console.error(error);
+            }
         });
         
         document.getElementById('extractBtn').addEventListener('click', function() {
