@@ -174,7 +174,8 @@
                 alert('Masukkan teks terlebih dahulu!');
                 return;
             }
-            
+
+            // Ekstrak hasil
             try {
                 // Validasi apakah input adalah JSON yang valid
                 const parsedInput = JSON.parse(inputText);
@@ -197,6 +198,15 @@
                 alert('Format JSON tidak valid. Pastikan teks yang dimasukkan adalah JSON yang benar.');
                 console.error(error);
             }
+
+            //Copy hasil ekstraksi
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = extractResult.textContent;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            alert('Hasil ekstraksi berhasil disalin!');
         });
         
         document.getElementById('extractBtn').addEventListener('click', function() {
