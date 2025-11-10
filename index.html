@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konverter ke GeoJSON</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-section, .output-section, .extract-section {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .output-section textarea {
+            background-color: #f8f9fa;
+        }
+        .copy-btn {
+            background-color: #27ae60;
+        }
+        .copy-btn:hover {
+            background-color: #219653;
+        }
+        .extract-btn {
+            background-color: #e67e22;
+        }
+        .extract-btn:hover {
+            background-color: #d35400;
+        }
+        .example {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            min-height: 60px;
+        }
+        .section-title {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .format-info {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Konverter ke Format GeoJSON</h1>
+        
+        <div class="input-section">
+            <label for="inputText">Masukkan teks GeoJSON features:</label>
+            <textarea id="inputText" placeholder='Contoh: {"type": "Feature", "properties": {"NAME": "Kawasan Konservasi Laut Daerah Kep. Mentawai", "STATE_PROV": "Sumatera Barat", "LOKASI": "Desa Saibi Samukop, Saliguma dan desa Katurai"}, "geometry": {"type": "Point", "coordinates": [106.8272, -6.1754]}}'></textarea>
+            <div class="example">
+                Contoh format yang valid: Objek GeoJSON feature dalam format JSON
+            </div>
+            
+            <div class="format-info">
+                <strong>Format Ekstraksi:</strong> NAME (lokasi LOKASI - STATE_PROV)<br>
+                Contoh: Kawasan Konservasi Laut Daerah Kep. Mentawai (lokasi Desa Saibi Samukop,Saliguma dan desa Katurai - Sumatera Barat)
+            </div>
+        </div>
+        
+        <button id="convertBtn">Konversi ke GeoJSON</button>
+        <button id="extractBtn" class="extract-btn">Ekstrak NAME - STATE_PROV</button>
+        
+        <div class="output-section">
+            <div class="section-title">Hasil Konversi GeoJSON</div>
+            <label for="outputText">Format GeoJSON Lengkap:</label>
+            <textarea id="outputText" readonly></textarea>
+            <button id="copyBtn" class="copy-btn">Salin Hasil GeoJSON</button>
+        </div>
+        
+        <div class="extract-section">
+            <div class="section-title">Hasil Ekstraksi</div>
+            <label>Nilai NAME - STATE_PROV:</label>
+            <div class="result-box" id="extractResult">Hasil ekstraksi akan muncul di sini</div>
+            <button id="copyExtractBtn" class="copy-btn">Salin Hasil Ekstraksi</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputText').value.trim();
+            const outputTextarea = document.getElementById('outputText');
+            
+            if (!inputText) {
+                alert('Masukkan teks terlebih dahulu!');
+                return;
+            }
+            
+            try {
+                // Validasi apakah input adalah JSON yang valid
+                const parsedInput = JSON.parse(inputText);
+                
+                // Format output sesuai permintaan
+                const result = {
+                    "type": "FeatureCollection",
+                    "name": "tes",
+                    "features": [parsedInput]
+                };
+                
+                outputTextarea.value = JSON.stringify(result, null, 2);
+            } catch (error) {
+                alert('Format JSON tidak valid. Pastikan teks yang dimasukkan adalah JSON yang benar.');
+                console.error(error);
+            }
+        });
+        
+        document.getElementById('extractBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputText').value.trim();
+            const extractResult = document.getElementById('extractResult');
+            
+            if (!inputText) {
+                alert('Masukkan teks terlebih dahulu!');
+                return;
+            }
+            
+            try {
+                // Validasi apakah input adalah JSON yang valid
+                const parsedInput = JSON.parse(inputText);
+                
+                // Ekstrak nilai NAME, LOKASI dan STATE_PROV
+                const name = parsedInput.properties?.NAME || "";
+                const stateProv = parsedInput.properties?.STATE_PROV || "";
+                const lokasi = parsedInput.properties?.LOKASI || "";
+                
+                // Format hasil ekstraksi sesuai permintaan
+                let result = "";
+                if (name && stateProv) {
+                        result = `${name} - ${stateProv}`;
+                } else {
+                    result = "Data NAME atau STATE_PROV tidak lengkap";
+                }
+                
+                extractResult.textContent = result;
+            } catch (error) {
+                alert('Format JSON tidak valid. Pastikan teks yang dimasukkan adalah JSON yang benar.');
+                console.error(error);
+            }
+        });
+        
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const outputText = document.getElementById('outputText');
+            outputText.select();
+            document.execCommand('copy');
+            alert('Teks GeoJSON berhasil disalin!');
+        });
+        
+        document.getElementById('copyExtractBtn').addEventListener('click', function() {
+            const extractResult = document.getElementById('extractResult');
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = extractResult.textContent;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            alert('Hasil ekstraksi berhasil disalin!');
+        });
+    </script>
+</body>
+</html>
